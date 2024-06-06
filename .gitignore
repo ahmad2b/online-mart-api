@@ -1,0 +1,9 @@
+# Common ignores for all services
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Docker
+Dockerfile
+docker-compose.yml
+*.env
