@@ -37,7 +37,7 @@ The Auth Service is a microservice within the Online Mart API project. It uses K
 1. **Clone the repository**:
 
 ```bash
-git clone <repo-url>
+git clone https://github.com/ahmad2b/online-mart-api
 cd auth-service
 ```
 
