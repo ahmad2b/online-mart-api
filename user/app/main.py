@@ -4,32 +4,34 @@ from typing import AsyncGenerator
 from fastapi import FastAPI
 
 from app.core.db import create_db_and_tables
-from app.kafka.producer.producer import get_kafka_producer, produce_message
-from app.kafka.consumer.consumer import consume_messages
-from app.kafka.consumer.user_consumer import UserConsumer
-
-
 from app.api.main import api_router
 from app.core.config import settings
-
-
-# auth_event_consumer = AuthEventConsumer(kafka_servers=["kafka:9092"])
+from app.kafka.consumer.index import UserConsumer
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI)-> AsyncGenerator[None, None]:
     print("Creating tables..")
     create_db_and_tables()
-    consumer = UserConsumer(settings.BOOTSTRAP_SERVER, settings.KAFKA_CONSUMER_GROUP_ID)
+    consumer = UserConsumer(
+        settings.BOOTSTRAP_SERVER, 
+        settings.KAFKA_CONSUMER_GROUP_ID
+    )
+    await (consumer.start())
     asyncio.create_task(consumer.consume())
-
-
-    # task = asyncio.create_task(consume_messages(
-    #     topics=["users"],  # List the topics you want to consume
-    #     bootstrap_servers=settings.BOOTSTRAP_SERVER,
-    #     group_id=settings.KAFKA_CONSUMER_GROUP_ID
-    # ))
-    yield
+    
+    try:
+        yield
+    finally:
+        print("Stopping consumer..")
+        # await consumer.stop()
+        # task.cancel()
+        # await task
+        # print("Consumer stopped..")
+        # print("Closing tables..")
+        # await close_db_and_tables()
+        # print("Tables closed..")
+        # print("App stopped..") 
 
 app = FastAPI(
     lifespan=lifespan, 
@@ -38,12 +40,8 @@ app = FastAPI(
     version="0.0.1",
     )
 
-# @app.on_event("")
-
-
 @app.get("/")
 def read_root():
     return {"Hello": "User Service"}
-
 
 app.include_router(api_router, prefix=settings.API_V1_STR)

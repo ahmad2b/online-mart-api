@@ -6,6 +6,10 @@ from sqlmodel import Session
 
 from app.core.db import engine
 from app.models import User
+from app.kafka.producer.product import ProductProducer
+from app.kafka.producer.category import CategoryProducer
+from app.kafka.producer.brand import BrandProducer
+
 
 def get_db() -> Generator[Session, None, None]:
     with Session(engine) as session:
@@ -29,3 +33,37 @@ def get_current_active_superuser(current_user: CurrentUser) -> User:
             status_code=403, detail="The user doesn't have enough privileges"
         )
     return current_user
+
+
+async def get_product_producer():
+    producer = ProductProducer()
+    await producer.start()
+    try:
+        yield producer
+    finally:
+        await producer.stop()
+        
+
+async def get_category_producer():
+    producer = CategoryProducer()
+    await producer.start()
+    try:
+        yield producer
+    finally:
+        await producer.stop()
+
+
+async def get_brand_producer():
+    producer = BrandProducer()
+    await producer.start()
+    try:
+        yield producer
+    finally:
+        await producer.stop()
+        
+
+ProductProducerDep = Annotated[ProductProducer, Depends(get_product_producer)]
+
+CategoryProducerDep = Annotated[CategoryProducer, Depends(get_category_producer)]
+
+BrandProducerDep = Annotated[BrandProducer, Depends(get_brand_producer)]

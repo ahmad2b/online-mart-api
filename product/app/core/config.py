@@ -20,11 +20,11 @@ load_dotenv()
 
 import os
 
-POSTGRES_SERVER = os.getenv("POSTGRES_SERVER") or "localhost"
-POSTGRES_PORT = os.getenv("POSTGRES_PORT") or 5432 
-POSTGRES_USER = os.getenv("POSTGRES_USER") or "postgres" 
-POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD") or "changethis"
-POSTGRES_DB = os.getenv("POSTGRES_DB") or "user_service"
+POSTGRES_SERVER = os.getenv("POSTGRES_SERVER") or "postgres-product"
+POSTGRES_PORT = os.getenv("POSTGRES_PORT") or "5432" 
+POSTGRES_USER = os.getenv("POSTGRES_USER") or "user" 
+POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD") or "password"
+POSTGRES_DB = os.getenv("POSTGRES_DB") or "productdb"
 
 
 
@@ -59,7 +59,7 @@ class Settings(BaseSettings):
         list[AnyUrl] | str, BeforeValidator(parse_cors)
     ] = []
 
-    PROJECT_NAME: str = "Auth Service"
+    PROJECT_NAME: str = "Product Service"
     SENTRY_DSN: HttpUrl | None = None
     POSTGRES_SERVER: str = POSTGRES_SERVER
     POSTGRES_PORT: int = POSTGRES_PORT 

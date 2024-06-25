@@ -1,5 +1,5 @@
 from sqlmodel import Field, SQLModel
-
+ 
 class AuthUserBase(SQLModel):
     email: str = Field(unique=True, index=True)
     full_name: str | None = None
@@ -23,7 +23,7 @@ class TokenPayload(SQLModel):
 class NewPassword(SQLModel):
     token: str
     new_password: str
-    
+
 # Generic message
 class Message(SQLModel):
     message: str
