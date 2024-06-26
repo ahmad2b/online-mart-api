@@ -17,7 +17,17 @@ async def lifespan(app: FastAPI)-> AsyncGenerator[None, None]:
         yield
     finally:
         print("Stopping app..")
-
+        # print("Stopping consumers...")
+        # await product_consumer.stop()
+        # await category_consumer.stop()
+        # await brand_consumer.stop()
+        # product_task.cancel()
+        # category_task.cancel()
+        # brand_task.cancel()
+        # print("Consumers stopped.")
+        # await close_db_and_tables()
+        # print("Tables closed..")
+        # print("App stopped..") 
 
 app = FastAPI(
     lifespan=lifespan, 
