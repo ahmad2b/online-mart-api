@@ -6,72 +6,84 @@ services:
       context: ./user
       dockerfile: Dockerfile.dev
     volumes:
-      - ./user:/code # Sync local development directory with the container
+      - ./user:/code
     depends_on:
       - postgres-user
       - broker
     ports:
-      - "8001:8000" # Expose container port 8000 to host port 8000
+      - "8001:8000"
+    networks:
+      - backend
 
   product-service:
     build:
       context: ./product
       dockerfile: Dockerfile.dev
     volumes:
-      - ./product:/code # Sync local development directory with the container
+      - ./product:/code
     depends_on:
       - postgres-product
       - broker
     ports:
-      - "8002:8000" # Expose container port 8000 to host port 8000
+      - "8002:8000"
+    networks:
+      - backend
 
   order-service:
     build:
       context: ./order
       dockerfile: Dockerfile.dev
     volumes:
-      - ./order:/code # Sync local development directory with the container
+      - ./order:/code
     depends_on:
       - postgres-order
       - broker
     ports:
-      - "8003:8000" # Expose container port 8000 to host port 8000
+      - "8003:8000"
+    networks:
+      - backend
 
   inventory-service:
     build:
       context: ./inventory
       dockerfile: Dockerfile.dev
     volumes:
-      - ./inventory:/code # Sync local development directory with the container
+      - ./inventory:/code
     depends_on:
       - postgres-inventory
       - broker
     ports:
-      - "8004:8000" # Expose container port 8000 to host port 8000
+      - "8004:8000"
+    networks:
+      - backend
 
   notification-service:
     build:
       context: ./notification
       dockerfile: Dockerfile.dev
     volumes:
-      - ./notification:/code # Sync local development directory with the container
+      - ./notification:/code
     depends_on:
       - postgres-notification
       - broker
     ports:
-      - "8005:8000" # Expose container port 8000 to host port 8000
+      - "8005:8000"
+    networks:
+      - backend
 
   payment-service:
     build:
       context: ./payment
       dockerfile: Dockerfile.dev
     volumes:
-      - ./payment:/code # Sync local development directory with the container
+      - ./payment:/code
     depends_on:
       - postgres-payment
       - broker
     ports:
-      - "8006:8000" # Expose container port 8000 to host port 8000
+      - "8006:8000"
+    networks:
+      - backend
 
   auth-service:
     build:
@@ -84,6 +96,8 @@ services:
       - broker
     ports:
       - "8007:8000"
+    networks:
+      - backend
 
   postgres-user:
     image: postgres:latest
@@ -96,6 +110,8 @@ services:
       - "5433:5432"
     volumes:
       - postgres_user_data:/var/lib/postgresql/data
+    networks:
+      - backend
 
   postgres-product:
     image: postgres:latest
@@ -108,6 +124,8 @@ services:
       - "5434:5432"
     volumes:
       - postgres_product_data:/var/lib/postgresql/data
+    networks:
+      - backend
 
   postgres-order:
     image: postgres:latest
@@ -120,6 +138,8 @@ services:
       - "5435:5432"
     volumes:
       - postgres_order_data:/var/lib/postgresql/data
+    networks:
+      - backend
 
   postgres-inventory:
     image: postgres:latest
@@ -132,6 +152,8 @@ services:
       - "5436:5432"
     volumes:
       - postgres_inventory_data:/var/lib/postgresql/data
+    networks:
+      - backend
 
   postgres-payment:
     image: postgres:latest
@@ -144,6 +166,8 @@ services:
       - "5437:5432"
     volumes:
       - postgres_payment_data:/var/lib/postgresql/data
+    networks:
+      - backend
 
   postgres-notification:
     image: postgres:latest
@@ -156,6 +180,8 @@ services:
       - "5438:5432"
     volumes:
       - postgres_notification_data:/var/lib/postgresql/data
+    networks:
+      - backend
 
   postgres-auth:
     image: postgres:latest
@@ -168,6 +194,8 @@ services:
       - "5439:5432"
     volumes:
       - postgres_auth_data:/var/lib/postgresql/data
+    networks:
+      - backend
 
   broker:
     image: apache/kafka:3.7.0
@@ -190,6 +218,8 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       KAFKA_LOG_DIRS: "/tmp/kraft-combined-logs"
+    networks:
+      - backend
 
   kafka-ui:
     image: provectuslabs/kafka-ui
@@ -202,6 +232,8 @@ services:
       DYNAMIC_CONFIG_ENABLED: "true"
     depends_on:
       - broker
+    networks:
+      - backend
 
 volumes:
   postgres_user_data:
@@ -222,5 +254,5 @@ volumes:
     driver: local
 
 networks:
-  default:
+  backend:
     driver: bridge

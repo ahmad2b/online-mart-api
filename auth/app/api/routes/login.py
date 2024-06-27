@@ -19,7 +19,7 @@ async def login_access_token(session: SessionDep, form_data: OAuth2PasswordReque
     elif not user.is_active:
         raise HTTPException(status_code=400, detail="Inactive user")
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-    token = create_access_token(user.id, expires_delta=access_token_expires)
+    token = create_access_token(user.id, user.full_name, user.email, expires_delta=access_token_expires)
     # Produce Kafka event
     producer = AuthProducer(settings.BOOTSTRAP_SERVER)
     await producer.start()

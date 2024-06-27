@@ -2,6 +2,8 @@ import asyncio
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
 
 from app.core.db import create_db_and_tables
 from app.api.main import api_router
@@ -10,7 +12,6 @@ from app.kafka.consumer.auth_consumer import AuthConsumer
 
 
 # auth_event_consumer = AuthEventConsumer(kafka_servers=["kafka:9092"])
-
 
 @asynccontextmanager
 async def lifespan(app: FastAPI)-> AsyncGenerator[None, None]:
@@ -42,12 +43,27 @@ async def lifespan(app: FastAPI)-> AsyncGenerator[None, None]:
         # print("Tables closed..")
         # print("App stopped..") 
 
+origins = [
+    "http://localhost:8002",  # Allow your product-service URL
+    "http://localhost:8001",
+    "http://localhost:8000",
+]
+
+
 app = FastAPI(
     lifespan=lifespan, 
     title=settings.PROJECT_NAME,
     openapi_url=f"{settings.API_V1_STR}/openapi.json",
     version="0.0.1",
     )
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/")
 def read_root():

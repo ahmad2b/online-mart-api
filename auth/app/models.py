@@ -12,6 +12,9 @@ class AuthUserCreate(AuthUserBase):
 class AuthUser(AuthUserBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
     hashed_password: str
+    
+class AuthUserPublic(AuthUserBase):
+    id: int
 
 class Token(SQLModel):
     access_token: str

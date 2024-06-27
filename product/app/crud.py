@@ -1,5 +1,5 @@
 from app.models import Product, Category, Brand
-from app.crud.utils import CRUDBase
+from app.utils import CRUDBase
 
 class CRUDProduct(CRUDBase[Product]):
     pass

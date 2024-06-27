@@ -26,6 +26,9 @@ POSTGRES_USER = os.getenv("POSTGRES_USER") or "postgres"
 POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD") or "changethis"
 POSTGRES_DB = os.getenv("POSTGRES_DB") or "user_service"
 
+PRIVATE_KEY: str = os.getenv("PRIVATE_KEY") or ""
+PUBLIC_KEY: str = os.getenv("PUBLIC_KEY") or ""
+
 
 
 def parse_cors(v: Any) -> list[str] | str:
@@ -69,6 +72,8 @@ class Settings(BaseSettings):
     BOOTSTRAP_SERVER: str = os.getenv("KAFKA_BOOTSTRAP_SERVERS") or ""
     KAFKA_TOPIC:str = os.getenv("KAFKA_TOPIC") or ""
     KAFKA_CONSUMER_GROUP_ID:str = os.getenv("KAFKA_CONSUMER_GROUP_ID") or ""
+    PRIVATE_KEY: str = PRIVATE_KEY
+    PUBLIC_KEY: str = PUBLIC_KEY
     
 
     @computed_field  # type: ignore[misc]

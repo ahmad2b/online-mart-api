@@ -131,3 +131,7 @@ class UserUpdateMe(SQLModel):
 # Database model, database table inferred from class name
 class User(UserBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
+
+    
+class AuthUserPublic(UserBase):
+    id: int

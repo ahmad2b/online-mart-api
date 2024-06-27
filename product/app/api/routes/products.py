@@ -1,11 +1,10 @@
 from typing import Any
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, HTTPException
 from sqlmodel import select, func
 
-from app import crud
-from app.api.deps import SessionDep, get_current_active_superuser, ProductProducer, get_product_producer ,ProductProducerDep
+from app.api.deps import SessionDep, ProductProducerDep, CurrentUser
 from app.models import ProductPublic, Product, ProductsPublic, ProductCreate, ProductUpdate, Message
-from app.crud.index import product_crud as crud
+from app.crud import product_crud, category_crud, brand_crud
 
 router = APIRouter()
 
@@ -23,24 +22,34 @@ async def read_products(session: SessionDep, skip: int = 0, limit: int = 100) ->
     return ProductsPublic(data=products, count=count)
     
 
-@router.post("/", dependencies=[Depends(get_current_active_superuser)], response_model=ProductPublic)
-async def create_product(*, session: SessionDep, product_in: ProductCreate, producer: ProductProducerDep):
+@router.post("/", response_model=ProductPublic)
+async def create_product(*, session: SessionDep, product_in: ProductCreate, producer: ProductProducerDep, current_user: CurrentUser):
     """
     Create a new product
     """
-    product = crud.create(session=session, obj_in=product_in)
+    # Check if category exists
+    category = category_crud.get_by_id(session=session, id=product_in.category_id)
+    if not category:
+        raise HTTPException(status_code=404, detail="Category not found")
+    
+    # Check if brand exists
+    brand = brand_crud.get_by_id(session=session, id=product_in.brand_id)
+    if not brand:
+        raise HTTPException(status_code=404, detail="Brand not found")
+    
+    product = product_crud.create(session=session, obj_in=product_in)
     await producer.product_created(product.dict())
     return product
 
-@router.patch("/{product_id}", dependencies=[Depends(get_current_active_superuser)], response_model=ProductPublic)
-async def update_product(*, session: SessionDep, product_id: int, product_in: ProductUpdate, producer: ProductProducerDep ) -> Any:
+@router.patch("/{product_id}", response_model=ProductPublic)
+async def update_product(*, session: SessionDep, product_id: int, product_in: ProductUpdate, producer: ProductProducerDep, current_user: CurrentUser ) -> Any:
     """
     Update a product
     """
-    db_product = crud.get_by_id(session=session, id=product_id)
+    db_product = product_crud.get_by_id(session=session, id=product_id)
     if not db_product:
         raise HTTPException(status_code=404, detail="Product not found")    
-    db_product = crud.update(session=session, db_obj=db_product, obj_in=product_in)
+    db_product = product_crud.update(session=session, db_obj=db_product, obj_in=product_in)
     await producer.product_updated(db_product.dict())
     return db_product
 
@@ -49,20 +58,20 @@ def get_product_by_id(product_id: int, session: SessionDep)-> Any:
     """
     Get a specific product by id.
     """
-    product = crud.get_by_id(session=session, id=product_id)
+    product = product_crud.get_by_id(session=session, id=product_id)
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
     return product
 
 
-@router.delete("/{product_id}", dependencies=[Depends(get_current_active_superuser)], response_model=Message)
-async def delete_product(session: SessionDep, product_id: int, producer: ProductProducerDep) -> Message:
+@router.delete("/{product_id}", response_model=Message)
+async def delete_product(session: SessionDep, product_id: int, producer: ProductProducerDep, current_user: CurrentUser) -> Message:
     """
     Delete a product
     """
-    product = crud.get_by_id(session=session, id=product_id)
+    product = product_crud.get_by_id(session=session, id=product_id)
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
-    crud.remove(session=session, id=product_id)
+    product_crud.remove(session=session, id=product_id)
     await producer.product_deleted(product.dict())
     return Message(message="Product deleted successfully")

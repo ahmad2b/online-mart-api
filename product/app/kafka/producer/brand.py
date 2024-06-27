@@ -1,6 +1,5 @@
 import json
 from aiokafka import AIOKafkaProducer
-from fastapi import Depends
 from app.core.config import settings
 
 class BrandProducer:

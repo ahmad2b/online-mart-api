@@ -1,9 +1,9 @@
-from typing import List, Any
-from fastapi import APIRouter, HTTPException, Depends
-from sqlmodel import Session, select, func
+from typing import Any
+from fastapi import APIRouter, HTTPException
+from sqlmodel import select, func
 
-from app.crud.index import category_crud as crud
-from app.api.deps import SessionDep, get_current_active_superuser, CategoryProducerDep
+from app.crud import category_crud as crud
+from app.api.deps import SessionDep, CategoryProducerDep, CurrentUser
 from app.models import (
     Message, Category, CategoryCreate, CategoryPublic, CategoryUpdate, CategoriesPublic
 )
@@ -24,8 +24,8 @@ def get_all_categories(session: SessionDep, skip: int = 0, limit: int = 100) -> 
     return CategoriesPublic(data=categories, count=count)
 
 
-@router.post("/", dependencies=[Depends(get_current_active_superuser)], response_model=CategoryPublic)
-async def create_category(*, session: SessionDep,  category_in: CategoryCreate, producer: CategoryProducerDep) -> Any:
+@router.post("/", response_model=CategoryPublic)
+async def create_category(*, session: SessionDep,  category_in: CategoryCreate, producer: CategoryProducerDep, current_user: CurrentUser) -> Any:
     """
     Create a new category
     """
@@ -34,8 +34,8 @@ async def create_category(*, session: SessionDep,  category_in: CategoryCreate, 
     return category
 
 
-@router.patch("/{category_id}", dependencies=[Depends(get_current_active_superuser)], response_model=CategoryPublic)
-async def update_category(*, session: SessionDep, category_id: int, category_in: CategoryUpdate, producer: CategoryProducerDep) -> Any:
+@router.patch("/{category_id}", response_model=CategoryPublic)
+async def update_category(*, session: SessionDep, category_id: int, category_in: CategoryUpdate, producer: CategoryProducerDep, current_user: CurrentUser) -> Any:
     db_category = crud.category_crud.get_by_id(session=session, id=category_id)
     if not db_category:
         raise HTTPException(status_code=404, detail="Category not found")
@@ -50,8 +50,8 @@ def read_category_by_id(category_id: int, session: SessionDep) -> Any:
         raise HTTPException(status_code=404, detail="Category not found")
     return category
 
-@router.delete("/{category_id}", dependencies=[Depends(get_current_active_superuser)], response_model=Message)
-async def delete_category(session: SessionDep, category_id: int, producer: CategoryProducerDep) -> Message:
+@router.delete("/{category_id}", response_model=Message)
+async def delete_category(session: SessionDep, category_id: int, producer: CategoryProducerDep, current_user: CurrentUser) -> Message:
     category = crud.category_crud.get_by_id(session=session, id=category_id)
     if not category:
         raise HTTPException(status_code=404, detail="Category not found")
