@@ -9,7 +9,7 @@ from app.crud import product_crud, category_crud, brand_crud
 router = APIRouter()
 
 @router.get("/", response_model=ProductsPublic)
-async def read_products(session: SessionDep, skip: int = 0, limit: int = 100) -> Any:
+async def get_all_products(session: SessionDep, skip: int = 0, limit: int = 100) -> Any:
     """
     Get all products
     """

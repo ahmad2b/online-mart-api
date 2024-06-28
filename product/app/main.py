@@ -40,9 +40,7 @@ async def lifespan(app: FastAPI)-> AsyncGenerator[None, None]:
         category_task.cancel()
         brand_task.cancel()
         print("Consumers stopped.")
-        # await close_db_and_tables()
-        # print("Tables closed..")
-        # print("App stopped..") 
+
 
 app = FastAPI(
     lifespan=lifespan, 

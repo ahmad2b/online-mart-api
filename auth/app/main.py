@@ -44,9 +44,12 @@ async def lifespan(app: FastAPI)-> AsyncGenerator[None, None]:
         # print("App stopped..") 
 
 origins = [
-    "http://localhost:8002",  # Allow your product-service URL
-    "http://localhost:8001",
-    "http://localhost:8000",
+    "http://localhost:8001",  # User Service 
+    "http://localhost:8002",  # Product Service
+    "http://localhost:8003",  # Order Service
+    "http://localhost:8004",  # Inventory Service
+    "http://localhost:8005",  # Notification Service
+    "http://localhost:8006",  # Payment Service
 ]
 
 
