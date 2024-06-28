@@ -50,6 +50,7 @@ origins = [
     "http://localhost:8004",  # Inventory Service
     "http://localhost:8005",  # Notification Service
     "http://localhost:8006",  # Payment Service
+    "http://localhost:8008",  # Cart Service
 ]
 
 

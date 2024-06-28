@@ -99,6 +99,20 @@ services:
     networks:
       - backend
 
+  cart-service:
+    build:
+      context: ./cart
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./cart:/code
+    depends_on:
+      - postgres-cart
+      - broker
+    ports:
+      - "8008:8000"
+    networks:
+      - backend
+
   postgres-user:
     image: postgres:latest
     container_name: postgres-user
@@ -197,6 +211,20 @@ services:
     networks:
       - backend
 
+  postgres-cart:
+    image: postgres:latest
+    container_name: postgres-cart
+    environment:
+      POSTGRES_DB: cartdb
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5440:5432"
+    volumes:
+      - postgres_cart_data:/var/lib/postgresql/data
+    networks:
+      - backend
+
   broker:
     image: apache/kafka:3.7.0
     hostname: broker
@@ -251,6 +279,8 @@ volumes:
   postgres_auth_data:
     driver: local
   postgres_db:
+    driver: local
+  postgres_cart_data:
     driver: local
 
 networks:
